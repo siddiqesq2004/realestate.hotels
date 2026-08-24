@@ -1,0 +1,62 @@
+@import "tailwindcss";
+
+@theme {
+  --color-charcoal-900: #0a0a0c;
+  --color-charcoal-800: #121215;
+  --color-charcoal-700: #1a1a1f;
+  --color-charcoal-600: #26262d;
+  --color-bronze-300: #e6c898;
+  --color-bronze-400: #d4af6a;
+  --color-bronze-500: #b58d3c;
+  --color-bronze-600: #8c6a28;
+  --color-ivory-100: #fdfbf7;
+  --color-ivory-200: #f5f0e6;
+  --color-ivory-300: #e6dac3;
+  --color-concrete-400: #a3a3a3;
+  --color-concrete-500: #737373;
+  --color-glass-light: rgba(255, 255, 255, 0.05);
+  --color-glass-dark: rgba(0, 0, 0, 0.3);
+  --color-glass-border: rgba(255, 255, 255, 0.1);
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-playfair), ui-serif, Georgia, serif;
+}
+
+:root {
+  --background: var(--color-charcoal-900);
+  --foreground: var(--color-ivory-200);
+}
+
+html, body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
+
+/* Hide scrollbar for cleaner cinematic look */
+::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+}
+
+::selection {
+  background-color: var(--color-bronze-500);
+  color: var(--color-charcoal-900);
+}
+
+.text-gradient {
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-image: linear-gradient(to right, var(--color-bronze-300), var(--color-bronze-500));
+}
+
+.glass-panel {
+  background: var(--color-glass-dark);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--color-glass-border);
+}
