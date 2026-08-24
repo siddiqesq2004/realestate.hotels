@@ -27,6 +27,10 @@
   --foreground: var(--color-ivory-200);
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 html, body {
   background-color: var(--background);
   color: var(--foreground);

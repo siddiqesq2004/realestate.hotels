@@ -1,0 +1,8 @@
+- `[x]` Update `Navigation.tsx` (Enquiry button copy)
+- `[x]` Update `app/page.tsx` & `HtmlOverlay.tsx` (Homepage branding)
+- `[x]` Update `app/property/page.tsx` (Main property copy and Portfolio section)
+- `[x]` Update dummy property pages (`villa-serenity`, `azure-estate`, `the-pinnacle`)
+- `[x]` Add Owner Benefits section to `app/experience/page.tsx`
+- `[x]` Add Floor Plans & Layouts to `app/property/page.tsx` (Real estate investment copy)
+- `[x]` Update `app/location/page.tsx` (Global developments copy)
+- `[x]` Create `walkthrough.md`

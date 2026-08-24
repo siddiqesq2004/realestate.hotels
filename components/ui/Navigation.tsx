@@ -51,11 +51,11 @@ export default function Navigation() {
   }, []);
 
   const navLinks = [
-    { name: "The Property", href: "#property" },
-    { name: "Experience", href: "#experience" },
-    { name: "Amenities", href: "#amenities" },
-    { name: "Location", href: "#location" },
-    { name: "Investment", href: "#investment" },
+    { name: "Properties Available", href: "/property" },
+    { name: "Experience", href: "/experience" },
+    { name: "Amenities", href: "/amenities" },
+    { name: "Location", href: "/location" },
+    { name: "Investment", href: "/investment" },
   ];
 
   return (
@@ -68,10 +68,8 @@ export default function Navigation() {
       )}
     >
       <div className="container mx-auto px-6 md:px-12 flex items-center justify-between">
-        <a href="#" className="flex items-center gap-3 z-50 group">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-bronze-300 to-bronze-600 flex items-center justify-center transition-transform duration-500 group-hover:scale-105">
-            <span className="text-charcoal-900 font-serif font-bold text-lg leading-none">A</span>
-          </div>
+        <a href="/" className="flex items-center gap-3 z-50 group">
+          <img src="/aura-logo.png" alt="Aura Logo" className="w-10 h-10 object-contain transition-transform duration-500 group-hover:scale-105 rounded-full" />
           <span className="font-serif text-xl tracking-[0.2em] font-medium text-ivory-100 hidden sm:block">
             AURA
           </span>
@@ -92,10 +90,10 @@ export default function Navigation() {
         </nav>
 
         <div className="hidden md:flex items-center gap-6">
-          <button className="text-xs tracking-[0.15em] uppercase font-medium text-ivory-100 hover:text-bronze-300 transition-colors">
-            Login
-          </button>
-          <MagneticButton className="text-xs tracking-[0.15em] uppercase font-medium bg-bronze-500 hover:bg-bronze-400 text-charcoal-900 px-6 py-2.5 rounded-sm transition-colors duration-300 shadow-[0_0_10px_rgba(212,175,106,0.2)] hover:shadow-[0_0_20px_rgba(212,175,106,0.5)]">
+          <MagneticButton 
+            onClick={() => window.location.href = "/enquire"}
+            className="text-xs tracking-[0.15em] uppercase font-medium bg-bronze-500 hover:bg-bronze-400 text-charcoal-900 px-6 py-2.5 rounded-sm transition-colors duration-300 shadow-[0_0_10px_rgba(212,175,106,0.2)] hover:shadow-[0_0_20px_rgba(212,175,106,0.5)]"
+          >
             Enquire
           </MagneticButton>
         </div>
@@ -128,7 +126,7 @@ export default function Navigation() {
             </a>
           ))}
           <div className="w-12 h-[1px] bg-bronze-600/30 my-6" />
-          <button className="text-sm tracking-[0.2em] uppercase font-medium text-bronze-400">
+          <button onClick={() => window.location.href = "/enquire"} className="text-sm tracking-[0.2em] uppercase font-medium text-bronze-400">
             Enquire Now
           </button>
         </nav>

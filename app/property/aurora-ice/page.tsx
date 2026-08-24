@@ -1,0 +1,77 @@
+"use client";
+
+import Navigation from "@/components/ui/Navigation";
+import FadeIn from "@/components/ui/FadeIn";
+
+export default function AuroraIcePage() {
+  return (
+    <main className="bg-charcoal-900 min-h-screen text-ivory-100 overflow-x-hidden">
+      <Navigation />
+      
+      {/* Hero Section */}
+      <section className="relative h-screen w-full flex items-center justify-center">
+        <div 
+          className="absolute inset-0 z-0"
+          style={{
+            backgroundImage: "url('https://images.unsplash.com/photo-1621293954908-907159247fc8?auto=format&fit=crop&w=1920&q=80')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        >
+          <div className="absolute inset-0 bg-charcoal-900/60" />
+        </div>
+        
+        <div className="relative z-10 text-center px-6 mt-20">
+          <FadeIn delay={0.2}>
+            <p className="text-bronze-400 uppercase tracking-[0.3em] text-sm mb-6 font-medium">Reykjavik, Iceland</p>
+          </FadeIn>
+          <FadeIn delay={0.4}>
+            <h1 className="text-5xl md:text-8xl font-serif tracking-wide mb-6">Aurora Ice Hotel</h1>
+          </FadeIn>
+        </div>
+      </section>
+
+      {/* Overview Section */}
+      <section className="py-32 px-6 md:px-12 max-w-7xl mx-auto">
+        <div className="grid md:grid-cols-2 gap-16 items-center">
+          <FadeIn direction="right">
+            <h2 className="text-4xl font-serif text-ivory-100 mb-8">Location & Amenities</h2>
+            <p className="text-ivory-300 font-sans leading-relaxed text-lg font-light mb-6">
+              An architectural marvel set against the stark beauty of the Icelandic tundra. The Aurora Ice Hotel offers a once-in-a-lifetime real estate investment in the land of fire and ice.
+            </p>
+            <ul className="space-y-4 font-sans font-light text-ivory-200">
+              <li className="flex items-center gap-4">
+                <span className="w-2 h-2 rounded-full bg-bronze-500" />
+                Geothermal heated outdoor infinity lagoons
+              </li>
+              <li className="flex items-center gap-4">
+                <span className="w-2 h-2 rounded-full bg-bronze-500" />
+                Glass-domed suites for Northern Lights viewing
+              </li>
+              <li className="flex items-center gap-4">
+                <span className="w-2 h-2 rounded-full bg-bronze-500" />
+                Nordic culinary experiences featuring local foraging
+              </li>
+              <li className="flex items-center gap-4">
+                <span className="w-2 h-2 rounded-full bg-bronze-500" />
+                Private helicopter glacier tours
+              </li>
+            </ul>
+          </FadeIn>
+          <FadeIn direction="left">
+            <div className="aspect-[4/3] rounded-sm overflow-hidden">
+              <div 
+                className="w-full h-full"
+                style={{
+                  backgroundImage: "url('https://images.unsplash.com/photo-1517584144415-373f1d3269b6?auto=format&fit=crop&w=800&q=80')",
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                }}
+              />
+            </div>
+          </FadeIn>
+        </div>
+      </section>
+    </main>
+  );
+}

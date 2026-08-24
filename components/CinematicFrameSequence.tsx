@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import HtmlOverlay from "./sections/HtmlOverlay";
 
-const TOTAL_FRAMES = 240;
+const TOTAL_FRAMES = 209;
 
 export default function CinematicFrameSequence() {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -18,7 +18,7 @@ export default function CinematicFrameSequence() {
 
   const getFramePath = (index: number) => {
     const fileNumber = String(index + 1).padStart(4, "0");
-    return `/hotel-frames/frame_${fileNumber}.jpg`;
+    return `/hotel-frames/frame_${fileNumber}.png`;
   };
 
   const drawImageCover = useCallback((image: HTMLImageElement) => {

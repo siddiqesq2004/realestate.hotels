@@ -21,7 +21,7 @@ export default function HtmlOverlay({ progress = 0 }: HtmlOverlayProps) {
       {/* Scene 1: The Arrival (0% - 18%) */}
       <div className={`transition-all duration-700 ease-out absolute flex flex-col items-center ${getSceneOpacity(0.00, 0.18)}`}>
         <p className="font-sans text-sm md:text-base text-white/70 uppercase tracking-[0.3em] mb-4 drop-shadow-lg">
-          A DESTINATION REIMAGINED
+          HOTEL REAL ESTATE REIMAGINED
         </p>
         <h1 className="font-serif text-5xl md:text-7xl text-white drop-shadow-[0_4px_24px_rgba(0,0,0,0.8)] tracking-wide leading-tight">
           Where Luxury<br />Meets the Extraordinary.
@@ -44,21 +44,21 @@ export default function HtmlOverlay({ progress = 0 }: HtmlOverlayProps) {
           MORE THAN A STAY.
         </h2>
         <p className="font-serif text-4xl md:text-5xl text-white/90 drop-shadow-lg tracking-wide">
-          A WORLD OF ITS OWN.
+          A LEGACY OF OWNERSHIP.
         </p>
       </div>
 
       {/* Scene 4: The Grand Reveal (82% - 100%) */}
       <div className={`transition-all duration-700 ease-out absolute flex flex-col items-center ${getSceneOpacity(0.82, 1.00)} ${progress >= 0.82 ? "pointer-events-auto" : ""}`}>
         <h2 className="font-serif text-6xl md:text-8xl text-white mb-6 drop-shadow-[0_4px_24px_rgba(0,0,0,0.9)] tracking-widest uppercase">
-          GRAND HERITAGE
+          AURA HOTEL RESIDENCES
         </h2>
         <p className="font-sans text-xl md:text-2xl text-white/95 font-light tracking-wide drop-shadow-xl mb-12">
-          Discover a new standard of hospitality.
+          Discover a new standard of hotel real estate ownership.
         </p>
-        <button className="px-12 py-5 bg-[#b58d3c] hover:bg-[#cbad67] text-[#1c1c1c] uppercase tracking-[0.2em] text-sm font-bold transition-all duration-300 shadow-2xl hover:shadow-[0_0_30px_rgba(181,141,60,0.6)]">
-          EXPLORE THE PROPERTY &rarr;
-        </button>
+        <a href="/property" className="inline-block px-12 py-5 bg-[#b58d3c] hover:bg-[#cbad67] text-[#1c1c1c] uppercase tracking-[0.2em] text-sm font-bold transition-all duration-300 shadow-2xl hover:shadow-[0_0_30px_rgba(181,141,60,0.6)]">
+          EXPLORE THE PORTFOLIO &rarr;
+        </a>
       </div>
 
     </div>
