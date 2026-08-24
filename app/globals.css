@@ -40,11 +40,7 @@ html, body {
   min-height: 100%;
 }
 
-/* Hide scrollbar for cleaner cinematic look */
-::-webkit-scrollbar {
-  width: 0px;
-  background: transparent;
-}
+
 
 ::selection {
   background-color: var(--color-bronze-500);
