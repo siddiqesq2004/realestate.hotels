@@ -100,8 +100,27 @@ export default function CinematicFrameSequence() {
       await loadFrame(0);
       syncDrawNearestLoaded(0);
 
+      // Pass 1: Every 12th frame (quick flipbook across entire sequence)
+      for (let i = 12; i < TOTAL_FRAMES; i += 12) {
+        if (isCancelled) return;
+        await loadFrame(i);
+      }
+
+      // Pass 2: Every 6th frame
+      for (let i = 6; i < TOTAL_FRAMES; i += 6) {
+        if (isCancelled) return;
+        await loadFrame(i);
+      }
+
+      // Pass 3: Every 3rd frame
+      for (let i = 3; i < TOTAL_FRAMES; i += 3) {
+        if (isCancelled) return;
+        await loadFrame(i);
+      }
+
+      // Pass 4: Fill in all remaining frames for buttery smoothness
       for (let i = 1; i < TOTAL_FRAMES; i++) {
-        if (isCancelled) break;
+        if (isCancelled) return;
         await loadFrame(i);
       }
     };
