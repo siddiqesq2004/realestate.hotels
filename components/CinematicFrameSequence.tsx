@@ -29,29 +29,14 @@ export default function CinematicFrameSequence() {
     const ctx = canvas.getContext("2d", { alpha: false });
     if (!ctx) return;
 
-    const w = window.innerWidth;
-    const h = window.innerHeight;
-
-    ctx.clearRect(0, 0, w, h);
-
-    const imageRatio = image.naturalWidth / image.naturalHeight;
-    const canvasRatio = w / h;
-
-    let drawWidth, drawHeight, offsetX = 0, offsetY = 0;
-
-    if (imageRatio > canvasRatio) {
-      drawHeight = h;
-      drawWidth = drawHeight * imageRatio;
-      offsetX = (w - drawWidth) / 2;
-    } else {
-      drawWidth = w;
-      drawHeight = drawWidth / imageRatio;
-      offsetY = (h - drawHeight) / 2;
+    // Set internal canvas resolution to match the image precisely
+    if (canvas.width !== image.naturalWidth) {
+      canvas.width = image.naturalWidth;
+      canvas.height = image.naturalHeight;
     }
 
-    ctx.fillStyle = "#111"; 
-    ctx.fillRect(0, 0, w, h);
-    ctx.drawImage(image, offsetX, offsetY, drawWidth, drawHeight);
+    // Let CSS object-fit handle the screen covering to prevent expensive JS math and resize stutter
+    ctx.drawImage(image, 0, 0);
   }, []);
 
   const syncDrawNearestLoaded = useCallback((targetIndex: number) => {
@@ -180,39 +165,12 @@ export default function CinematicFrameSequence() {
     };
   }, [syncDrawNearestLoaded]);
 
-  // Resize Handling
-  useEffect(() => {
-    function resizeCanvas() {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
 
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      const width = window.innerWidth;
-      const height = window.innerHeight;
-
-      canvas.width = Math.floor(width * dpr);
-      canvas.height = Math.floor(height * dpr);
-      canvas.style.width = `${width}px`;
-      canvas.style.height = `${height}px`;
-
-      const ctx = canvas.getContext("2d");
-      if (ctx) {
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      }
-
-      const currentTarget = Math.round(scrollProgressRef.current * (TOTAL_FRAMES - 1));
-      syncDrawNearestLoaded(currentTarget);
-    }
-
-    window.addEventListener("resize", resizeCanvas);
-    resizeCanvas(); 
-    return () => window.removeEventListener("resize", resizeCanvas);
-  }, [syncDrawNearestLoaded]);
 
   return (
     <section ref={sectionRef} className="relative w-full" style={{ height: "1000vh" }}>
       <div className="sticky top-0 left-0 overflow-hidden bg-charcoal-900" style={{ width: '100vw', height: '100vh' }}>
-        <canvas ref={canvasRef} className="block w-full h-full" />
+        <canvas ref={canvasRef} className="block w-full h-full object-cover" />
         
         <div className="absolute inset-0 pointer-events-none z-10">
           <HtmlOverlay progress={progress} />
