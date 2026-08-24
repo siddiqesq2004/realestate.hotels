@@ -16,27 +16,43 @@ export default function CinematicFrameSequence() {
   const scrollProgressRef = useRef(0);
   const targetProgressRef = useRef(0);
   const currentProgressRef = useRef(0);
-  const rafIdRef = useRef<number | null>(null);
+
+  // Cache viewport dimensions (updated only on resize)
+  const viewportRef = useRef({ w: 0, h: 0 });
 
   const getFramePath = (index: number) => {
     const fileNumber = String(index + 1).padStart(4, "0");
     return `/hotel-frames/frame_${fileNumber}.png`;
   };
 
+  // Proper cover-fit drawing that crops the image to fill the viewport without distortion
   const drawImageCover = useCallback((image: HTMLImageElement) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d", { alpha: false });
     if (!ctx) return;
 
-    // Initialize canvas dimensions strictly ONCE to prevent expensive reallocations on mobile
-    if (canvas.width !== 1920) {
-      canvas.width = 1920;
-      canvas.height = 1080;
+    const vw = viewportRef.current.w;
+    const vh = viewportRef.current.h;
+    if (vw === 0 || vh === 0) return;
+
+    const imageRatio = image.naturalWidth / image.naturalHeight;
+    const canvasRatio = vw / vh;
+
+    let sx = 0, sy = 0, sw = image.naturalWidth, sh = image.naturalHeight;
+
+    // Crop the source image (not scale the destination) for a true "cover" fit
+    if (imageRatio > canvasRatio) {
+      // Image is wider than viewport — crop left/right
+      sw = image.naturalHeight * canvasRatio;
+      sx = (image.naturalWidth - sw) / 2;
+    } else {
+      // Image is taller than viewport — crop top/bottom
+      sh = image.naturalWidth / canvasRatio;
+      sy = (image.naturalHeight - sh) / 2;
     }
 
-    // Let CSS object-fit handle the screen covering to prevent expensive JS math and resize stutter
-    ctx.drawImage(image, 0, 0, 1920, 1080);
+    ctx.drawImage(image, sx, sy, sw, sh, 0, 0, vw, vh);
   }, []);
 
   const syncDrawNearestLoaded = useCallback((targetIndex: number) => {
@@ -69,7 +85,31 @@ export default function CinematicFrameSequence() {
     }
   }, [drawImageCover]);
 
-  // Massive Background Preloader
+  // Resize handler — set canvas buffer size once, cache viewport dims
+  useEffect(() => {
+    const resizeCanvas = () => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+
+      canvas.width = w;
+      canvas.height = h;
+
+      viewportRef.current = { w, h };
+
+      // Redraw current frame at new size
+      const idx = Math.round(scrollProgressRef.current * (TOTAL_FRAMES - 1));
+      syncDrawNearestLoaded(idx);
+    };
+
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
+    return () => window.removeEventListener("resize", resizeCanvas);
+  }, [syncDrawNearestLoaded]);
+
+  // Interlaced Background Preloader with parallel batch loading
   useEffect(() => {
     let isCancelled = false;
 
@@ -83,12 +123,10 @@ export default function CinematicFrameSequence() {
         img.onload = async () => {
           if (!isCancelled) {
             try {
-              // Decode off-main-thread to prevent ctx.drawImage from stuttering on the main thread!
               await img.decode();
-            } catch (e) {
-              // Ignore
+            } catch {
+              // Ignore decode errors
             }
-
             imagesRef.current.set(index, img);
             
             const target = Math.round(scrollProgressRef.current * (TOTAL_FRAMES - 1));
@@ -103,33 +141,39 @@ export default function CinematicFrameSequence() {
       });
     };
 
+    // Load a batch of frames in parallel (up to `batchSize` at a time)
+    const loadBatch = async (indices: number[], batchSize: number) => {
+      for (let i = 0; i < indices.length; i += batchSize) {
+        if (isCancelled) return;
+        const batch = indices.slice(i, i + batchSize);
+        await Promise.all(batch.map(idx => loadFrame(idx)));
+      }
+    };
+
     const preloadAll = async () => {
+      // Load frame 0 immediately
       await loadFrame(0);
       syncDrawNearestLoaded(0);
 
-      // Pass 1: Every 12th frame (quick flipbook across entire sequence)
-      for (let i = 12; i < TOTAL_FRAMES; i += 12) {
-        if (isCancelled) return;
-        await loadFrame(i);
-      }
+      // Pass 1: Every 10th frame in parallel batches of 4
+      const pass1 = [];
+      for (let i = 10; i < TOTAL_FRAMES; i += 10) pass1.push(i);
+      await loadBatch(pass1, 4);
 
-      // Pass 2: Every 6th frame
-      for (let i = 6; i < TOTAL_FRAMES; i += 6) {
-        if (isCancelled) return;
-        await loadFrame(i);
-      }
+      // Pass 2: Every 5th frame
+      const pass2 = [];
+      for (let i = 5; i < TOTAL_FRAMES; i += 5) pass2.push(i);
+      await loadBatch(pass2, 4);
 
-      // Pass 3: Every 3rd frame
-      for (let i = 3; i < TOTAL_FRAMES; i += 3) {
-        if (isCancelled) return;
-        await loadFrame(i);
-      }
+      // Pass 3: Every 2nd frame
+      const pass3 = [];
+      for (let i = 2; i < TOTAL_FRAMES; i += 2) pass3.push(i);
+      await loadBatch(pass3, 4);
 
-      // Pass 4: Fill in all remaining frames for buttery smoothness
-      for (let i = 1; i < TOTAL_FRAMES; i++) {
-        if (isCancelled) return;
-        await loadFrame(i);
-      }
+      // Pass 4: All remaining odd frames
+      const pass4 = [];
+      for (let i = 1; i < TOTAL_FRAMES; i += 2) pass4.push(i);
+      await loadBatch(pass4, 4);
     };
 
     preloadAll();
@@ -139,7 +183,7 @@ export default function CinematicFrameSequence() {
     };
   }, [syncDrawNearestLoaded]);
 
-  // Scroll Tracking
+  // Scroll Tracking with ultra-smooth lerp animation loop
   useEffect(() => {
     const updateTargetProgress = () => {
       const section = sectionRef.current;
@@ -153,35 +197,35 @@ export default function CinematicFrameSequence() {
       const newProgress = Math.max(0, Math.min(1, rawProgress));
 
       targetProgressRef.current = newProgress;
+      setProgress(newProgress);
     };
 
-    const handleScroll = () => {
-      updateTargetProgress();
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("scroll", updateTargetProgress, { passive: true });
     updateTargetProgress(); 
 
     let animationFrameId: number;
     let lastDrawnIndex = -1;
 
-    // Continuous loop decouples canvas drawing from sparse scroll events
     const loop = () => {
-      // Lerp (linear interpolation) for buttery smooth frame scrubbing
-      // Lowered to 0.035 for a heavier, ultra-premium cinematic camera momentum
-      currentProgressRef.current += (targetProgressRef.current - currentProgressRef.current) * 0.035;
-      scrollProgressRef.current = currentProgressRef.current; // sync for resize handler
+      const diff = targetProgressRef.current - currentProgressRef.current;
+
+      // Adaptive lerp: slower when close (ultra-smooth glide), faster when far (responsive)
+      const lerpFactor = Math.abs(diff) > 0.05 ? 0.06 : 0.025;
+      currentProgressRef.current += diff * lerpFactor;
+
+      // Snap to target when extremely close to prevent infinite float drift
+      if (Math.abs(diff) < 0.0001) {
+        currentProgressRef.current = targetProgressRef.current;
+      }
+
+      scrollProgressRef.current = currentProgressRef.current;
 
       const targetIndex = Math.round(currentProgressRef.current * (TOTAL_FRAMES - 1));
       
-      // Only draw if the frame index actually changed to save CPU/Battery
       if (targetIndex !== lastDrawnIndex) {
         syncDrawNearestLoaded(targetIndex);
         lastDrawnIndex = targetIndex;
       }
-
-      // Sync React state inside rAF instead of scroll event to prevent main-thread blocking
-      setProgress(currentProgressRef.current);
       
       animationFrameId = requestAnimationFrame(loop);
     };
@@ -189,17 +233,24 @@ export default function CinematicFrameSequence() {
     loop();
 
     return () => {
-      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("scroll", updateTargetProgress);
       cancelAnimationFrame(animationFrameId);
     };
   }, [syncDrawNearestLoaded]);
 
-
-
   return (
     <section ref={sectionRef} className="relative w-full" style={{ height: "400vh" }}>
-      <div className="sticky top-0 left-0 overflow-hidden bg-charcoal-900" style={{ width: '100vw', height: '100svh' }}>
-        <canvas ref={canvasRef} className="block w-full h-full object-cover" />
+      <div className="sticky top-0 left-0 overflow-hidden bg-charcoal-900" style={{ width: '100vw', height: '100vh' }}>
+        <canvas
+          ref={canvasRef}
+          className="block"
+          style={{
+            width: '100vw',
+            height: '100vh',
+            willChange: 'contents',
+            transform: 'translateZ(0)',
+          }}
+        />
         
         <div className="absolute inset-0 pointer-events-none z-10">
           <HtmlOverlay progress={progress} />
