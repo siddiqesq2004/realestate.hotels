@@ -29,14 +29,14 @@ export default function CinematicFrameSequence() {
     const ctx = canvas.getContext("2d", { alpha: false });
     if (!ctx) return;
 
-    // Set internal canvas resolution to match the image precisely
-    if (canvas.width !== image.naturalWidth) {
-      canvas.width = image.naturalWidth;
-      canvas.height = image.naturalHeight;
+    // Initialize canvas dimensions strictly ONCE to prevent expensive reallocations on mobile
+    if (canvas.width !== 1920) {
+      canvas.width = 1920;
+      canvas.height = 1080;
     }
 
     // Let CSS object-fit handle the screen covering to prevent expensive JS math and resize stutter
-    ctx.drawImage(image, 0, 0);
+    ctx.drawImage(image, 0, 0, 1920, 1080);
   }, []);
 
   const syncDrawNearestLoaded = useCallback((targetIndex: number) => {
@@ -153,7 +153,6 @@ export default function CinematicFrameSequence() {
       const newProgress = Math.max(0, Math.min(1, rawProgress));
 
       targetProgressRef.current = newProgress;
-      setProgress(newProgress); // React state updates instantly for UI text overlays
     };
 
     const handleScroll = () => {
@@ -180,6 +179,9 @@ export default function CinematicFrameSequence() {
         syncDrawNearestLoaded(targetIndex);
         lastDrawnIndex = targetIndex;
       }
+
+      // Sync React state inside rAF instead of scroll event to prevent main-thread blocking
+      setProgress(currentProgressRef.current);
       
       animationFrameId = requestAnimationFrame(loop);
     };
@@ -196,7 +198,7 @@ export default function CinematicFrameSequence() {
 
   return (
     <section ref={sectionRef} className="relative w-full" style={{ height: "400vh" }}>
-      <div className="sticky top-0 left-0 overflow-hidden bg-charcoal-900" style={{ width: '100vw', height: '100vh' }}>
+      <div className="sticky top-0 left-0 overflow-hidden bg-charcoal-900" style={{ width: '100vw', height: '100svh' }}>
         <canvas ref={canvasRef} className="block w-full h-full object-cover" />
         
         <div className="absolute inset-0 pointer-events-none z-10">
