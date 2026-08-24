@@ -54,7 +54,7 @@ export default function ROICalculator() {
             </div>
           </div>
 
-          <div className="grid md:grid-cols-4 gap-8 text-center pt-8 border-t border-white/5">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 text-center pt-8 border-t border-white/5">
             <div>
               <p className="text-xs uppercase tracking-[0.2em] text-ivory-400 mb-2">Net Rental Yield</p>
               <p className="text-3xl font-serif text-ivory-100">{(yieldRate * 100).toFixed(1)}%</p>

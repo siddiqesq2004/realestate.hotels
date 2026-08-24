@@ -352,8 +352,8 @@ export default function PropertyPage() {
 
       {/* Gated Content Modal */}
       {showModal && (
-        <div className="fixed inset-0 z-[100] bg-charcoal-900/80 backdrop-blur-md flex items-center justify-center p-6 animate-in fade-in duration-300">
-          <div className="bg-[#151515] border border-bronze-500/30 p-12 max-w-lg w-full text-center relative shadow-2xl">
+        <div className="fixed inset-0 z-[100] bg-charcoal-900/80 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-300">
+          <div className="bg-[#151515] border border-bronze-500/30 p-6 sm:p-12 max-w-lg w-full text-center relative shadow-2xl">
             <button 
               onClick={() => setShowModal(false)}
               className="absolute top-4 right-4 text-ivory-400 hover:text-white"
