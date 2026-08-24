@@ -168,7 +168,7 @@ export default function CinematicFrameSequence() {
 
 
   return (
-    <section ref={sectionRef} className="relative w-full" style={{ height: "1000vh" }}>
+    <section ref={sectionRef} className="relative w-full" style={{ height: "400vh" }}>
       <div className="sticky top-0 left-0 overflow-hidden bg-charcoal-900" style={{ width: '100vw', height: '100vh' }}>
         <canvas ref={canvasRef} className="block w-full h-full object-cover" />
         
