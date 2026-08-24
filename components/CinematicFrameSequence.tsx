@@ -80,8 +80,15 @@ export default function CinematicFrameSequence() {
           return;
         }
         const img = new Image();
-        img.onload = () => {
+        img.onload = async () => {
           if (!isCancelled) {
+            try {
+              // Decode off-main-thread to prevent ctx.drawImage from stuttering on the main thread!
+              await img.decode();
+            } catch (e) {
+              // Ignore
+            }
+
             imagesRef.current.set(index, img);
             
             const target = Math.round(scrollProgressRef.current * (TOTAL_FRAMES - 1));
@@ -162,7 +169,8 @@ export default function CinematicFrameSequence() {
     // Continuous loop decouples canvas drawing from sparse scroll events
     const loop = () => {
       // Lerp (linear interpolation) for buttery smooth frame scrubbing
-      currentProgressRef.current += (targetProgressRef.current - currentProgressRef.current) * 0.08;
+      // Lowered to 0.035 for a heavier, ultra-premium cinematic camera momentum
+      currentProgressRef.current += (targetProgressRef.current - currentProgressRef.current) * 0.035;
       scrollProgressRef.current = currentProgressRef.current; // sync for resize handler
 
       const targetIndex = Math.round(currentProgressRef.current * (TOTAL_FRAMES - 1));
