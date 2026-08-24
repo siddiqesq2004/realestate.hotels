@@ -14,6 +14,8 @@ export default function CinematicFrameSequence() {
   // Cache images
   const imagesRef = useRef<Map<number, HTMLImageElement>>(new Map());
   const scrollProgressRef = useRef(0);
+  const targetProgressRef = useRef(0);
+  const currentProgressRef = useRef(0);
   const rafIdRef = useRef<number | null>(null);
 
   const getFramePath = (index: number) => {
@@ -128,7 +130,7 @@ export default function CinematicFrameSequence() {
 
   // Scroll Tracking
   useEffect(() => {
-    const updateFromScroll = () => {
+    const updateTargetProgress = () => {
       const section = sectionRef.current;
       if (!section) return;
 
@@ -139,30 +141,42 @@ export default function CinematicFrameSequence() {
       const rawProgress = -rect.top / scrollableDistance;
       const newProgress = Math.max(0, Math.min(1, rawProgress));
 
-      scrollProgressRef.current = newProgress;
-      setProgress(newProgress);
-
-      const targetIndex = Math.round(newProgress * (TOTAL_FRAMES - 1));
-      
-      syncDrawNearestLoaded(targetIndex);
+      targetProgressRef.current = newProgress;
+      setProgress(newProgress); // React state updates instantly for UI text overlays
     };
 
     const handleScroll = () => {
-      if (rafIdRef.current) return;
-      rafIdRef.current = requestAnimationFrame(() => {
-        updateFromScroll();
-        rafIdRef.current = null;
-      });
+      updateTargetProgress();
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
-    updateFromScroll(); 
+    updateTargetProgress(); 
+
+    let animationFrameId: number;
+    let lastDrawnIndex = -1;
+
+    // Continuous loop decouples canvas drawing from sparse scroll events
+    const loop = () => {
+      // Lerp (linear interpolation) for buttery smooth frame scrubbing
+      currentProgressRef.current += (targetProgressRef.current - currentProgressRef.current) * 0.08;
+      scrollProgressRef.current = currentProgressRef.current; // sync for resize handler
+
+      const targetIndex = Math.round(currentProgressRef.current * (TOTAL_FRAMES - 1));
+      
+      // Only draw if the frame index actually changed to save CPU/Battery
+      if (targetIndex !== lastDrawnIndex) {
+        syncDrawNearestLoaded(targetIndex);
+        lastDrawnIndex = targetIndex;
+      }
+      
+      animationFrameId = requestAnimationFrame(loop);
+    };
+    
+    loop();
 
     return () => {
       window.removeEventListener("scroll", handleScroll);
-      if (rafIdRef.current) {
-        cancelAnimationFrame(rafIdRef.current);
-      }
+      cancelAnimationFrame(animationFrameId);
     };
   }, [syncDrawNearestLoaded]);
 
