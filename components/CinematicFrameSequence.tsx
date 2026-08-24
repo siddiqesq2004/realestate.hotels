@@ -104,7 +104,7 @@ export default function CinematicFrameSequence() {
           }
           resolve();
         };
-        img.onerror = resolve; 
+        img.onerror = () => resolve(); 
         img.src = getFramePath(index);
       });
     };
