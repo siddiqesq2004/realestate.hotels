@@ -107,19 +107,16 @@ export default function Preloader() {
   const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
   const easeInOut = (t: number) => t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
   
-  const iE = easeOut(insertP);
-  const tE = easeInOut(turnP);
-
   // Key Transforms relative to the lock plate
-  const tz = 250 * (1 - iE);      // Starts 250px out, pushes in to 0
-  const tx = 150 * (1 - iE);      // Starts 150px right, aligns to 0
-  const ty = 40 * (1 - iE) - 10;  // Starts 40px down, aligns to keyhole center (-10px)
+  const tz = 250 * (1 - iE);      // Starts 250px straight out in front, pushes perfectly straight in to 0
+  const tx = 0;                   // Perfectly aligned horizontally
+  const ty = -10;                 // Perfectly aligned with the keyhole slot vertically
   
-  const ry = -20 - 70 * iE;       // Starts slightly angled, turns to -90 (pointing straight into lock)
-  const rz = -45 * (1 - iE);      // Starts tilted, straightens to 0
-  const rx = 90 * tE;             // Rolls 90deg to unlock
+  const ry = -90;                 // Key always points directly straight into the lock
+  const rz = 0;                   // No tilt
+  const rx = 90 * tE;             // Rolls 90deg inside the lock to unlock
   
-  const keyOpacity = Math.min(insertP * 3, 1);
+  const keyOpacity = Math.min(insertP * 5, 1); // Fades in quickly at the start
 
   return (
     <div
@@ -140,7 +137,7 @@ export default function Preloader() {
         >
           {/* Entire Lock Scene tilted slightly so we can see the glorious 3D volume */}
           <div 
-            style={{ transform: `rotateY(-25deg) rotateX(15deg) scale(${1 + glowP * 0.1})`, transformStyle: 'preserve-3d' }} 
+            style={{ transform: `rotateY(-35deg) rotateX(15deg) scale(${1 + glowP * 0.1})`, transformStyle: 'preserve-3d' }} 
             className="relative flex items-center justify-center"
           >
             {/* Shockwave effect on unlock */}
