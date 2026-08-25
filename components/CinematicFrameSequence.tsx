@@ -206,23 +206,59 @@ export default function CinematicFrameSequence() {
     };
   }, [syncDrawNearestLoaded]);
 
-  // Scroll Tracking + ultra-smooth lerp animation loop
+  // JS-driven Step-Based Scroll Logic
   useEffect(() => {
-    // Scroll handler only updates the target ref — no React state updates here
-    const updateTargetProgress = () => {
-      const section = sectionRef.current;
-      if (!section) return;
+    // The exact progress targets for the 4 wording scenes
+    const STEPS = [0, 0.35, 0.65, 1.0];
+    let currentStepIndex = 0;
+    let isTransitioning = false;
+    let touchStartY = 0;
 
-      const rect = section.getBoundingClientRect();
-      const scrollableDistance = section.offsetHeight - window.innerHeight;
-      if (scrollableDistance <= 0) return;
-
-      const rawProgress = -rect.top / scrollableDistance;
-      targetProgressRef.current = Math.max(0, Math.min(1, rawProgress));
+    const navigateToStep = (direction: 1 | -1) => {
+      if (isTransitioning) return;
+      
+      const nextStep = currentStepIndex + direction;
+      if (nextStep >= 0 && nextStep < STEPS.length) {
+        currentStepIndex = nextStep;
+        isTransitioning = true;
+        targetProgressRef.current = STEPS[currentStepIndex];
+        
+        // Cooldown before allowing the next scroll action
+        // This ensures one flick = exactly one scene
+        setTimeout(() => {
+          isTransitioning = false;
+        }, 1200);
+      }
     };
 
-    window.addEventListener("scroll", updateTargetProgress, { passive: true });
-    updateTargetProgress();
+    const handleWheel = (e: WheelEvent) => {
+      e.preventDefault(); // Disable native scrolling completely
+      if (Math.abs(e.deltaY) > 20) {
+        navigateToStep(e.deltaY > 0 ? 1 : -1);
+      }
+    };
+
+    const handleTouchStart = (e: TouchEvent) => {
+      touchStartY = e.touches[0].clientY;
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      e.preventDefault(); // Disable native touch scrolling
+      if (isTransitioning) return;
+      
+      const touchEndY = e.touches[0].clientY;
+      const deltaY = touchStartY - touchEndY; // Positive = swipe up (scroll down)
+      
+      if (Math.abs(deltaY) > 30) {
+        navigateToStep(deltaY > 0 ? 1 : -1);
+      }
+    };
+
+    // Attach with passive: false so we can preventDefault
+    const options = { passive: false };
+    window.addEventListener("wheel", handleWheel, options);
+    window.addEventListener("touchstart", handleTouchStart, options);
+    window.addEventListener("touchmove", handleTouchMove, options);
 
     let animationFrameId: number;
     let lastDrawnIndex = -1;
@@ -233,13 +269,12 @@ export default function CinematicFrameSequence() {
       const diff = target - current;
       const absDiff = Math.abs(diff);
 
-      // Smooth continuous exponential lerp — no discontinuous jumps
-      // Factor of 0.08 gives a ~12-frame settling time (~200ms at 60fps)
-      // which feels responsive yet silky smooth
-      const lerpFactor = 0.08;
+      // Smooth continuous exponential lerp
+      // Factor 0.05 is slightly slower and more cinematic for scene transitions
+      const lerpFactor = 0.05;
       currentProgressRef.current = current + diff * lerpFactor;
 
-      // Snap to target when extremely close to prevent infinite float drift
+      // Snap to target when extremely close
       if (absDiff < 0.0005) {
         currentProgressRef.current = target;
       }
@@ -254,8 +289,7 @@ export default function CinematicFrameSequence() {
         lastDrawnIndex = targetIndex;
       }
 
-      // Throttled HtmlOverlay progress updates (~every 2 frames worth of change)
-      // Avoids hammering React setState at 60-120Hz
+      // Throttled HtmlOverlay progress updates
       if (Math.abs(currentProgressRef.current - overlayProgressRef.current) > 0.005) {
         overlayProgressRef.current = currentProgressRef.current;
         setProgress(currentProgressRef.current);
@@ -267,41 +301,26 @@ export default function CinematicFrameSequence() {
     loop();
 
     return () => {
-      window.removeEventListener("scroll", updateTargetProgress);
+      window.removeEventListener("wheel", handleWheel);
+      window.removeEventListener("touchstart", handleTouchStart);
+      window.removeEventListener("touchmove", handleTouchMove);
       cancelAnimationFrame(animationFrameId);
     };
   }, [syncDrawNearestLoaded]);
 
   return (
-    <section ref={sectionRef} className="relative w-full">
-      <div
-        className="sticky top-0 left-0 overflow-hidden bg-charcoal-900"
-        style={{ width: "100vw", height: "100dvh" }}
-      >
-        <canvas
-          ref={canvasRef}
-          className="block"
-          style={{
-            width: "100vw",
-            height: "100dvh",
-            willChange: "contents",
-            transform: "translateZ(0)",
-          }}
-        />
+    <section ref={sectionRef} className="relative w-full h-[100dvh] overflow-hidden bg-charcoal-900">
+      <canvas
+        ref={canvasRef}
+        className="block absolute inset-0 w-full h-full"
+        style={{
+          willChange: "contents",
+          transform: "translateZ(0)",
+        }}
+      />
 
-        <div className="absolute inset-0 pointer-events-none z-10">
-          <HtmlOverlay progress={progress} />
-        </div>
-      </div>
-
-      {/* Invisible scroll snap points (4 blocks of 100dvh = 400dvh total scroll space)
-          These correspond exactly to the 4 wording scenes: 
-          Progress 0, 0.33, 0.66, 1.0 */}
-      <div className="relative w-full pointer-events-none" style={{ marginTop: "-100dvh" }}>
-        <div style={{ height: "100dvh", scrollSnapAlign: "start" }} />
-        <div style={{ height: "100dvh", scrollSnapAlign: "start" }} />
-        <div style={{ height: "100dvh", scrollSnapAlign: "start" }} />
-        <div style={{ height: "100dvh", scrollSnapAlign: "start" }} />
+      <div className="absolute inset-0 pointer-events-none z-10">
+        <HtmlOverlay progress={progress} />
       </div>
     </section>
   );
