@@ -107,6 +107,9 @@ export default function Preloader() {
   const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
   const easeInOut = (t: number) => t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
   
+  const iE = easeOut(insertP);
+  const tE = easeInOut(turnP);
+
   // Key Transforms relative to the lock plate
   const tz = 250 * (1 - iE);      // Starts 250px straight out in front, pushes perfectly straight in to 0
   const tx = 0;                   // Perfectly aligned horizontally
