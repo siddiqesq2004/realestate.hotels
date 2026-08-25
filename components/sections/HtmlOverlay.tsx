@@ -58,7 +58,7 @@ export default function HtmlOverlay({ activeScene = 0 }: HtmlOverlayProps) {
         {/* Creative Navigation Grid */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-5 w-full mb-10">
           
-          <a href="/properties" className="group relative overflow-hidden rounded-xl bg-charcoal-900/40 border border-white/10 backdrop-blur-md p-5 flex flex-col items-center justify-center transition-all duration-500 hover:bg-white/10 hover:border-bronze-500 hover:-translate-y-2 hover:shadow-[0_10px_30px_rgba(181,141,60,0.3)]">
+          <a href="/property" className="group relative overflow-hidden rounded-xl bg-charcoal-900/40 border border-white/10 backdrop-blur-md p-5 flex flex-col items-center justify-center transition-all duration-500 hover:bg-white/10 hover:border-bronze-500 hover:-translate-y-2 hover:shadow-[0_10px_30px_rgba(181,141,60,0.3)]">
             <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
             <span className="font-sans text-[10px] sm:text-xs tracking-[0.2em] text-bronze-400 mb-2 uppercase opacity-80 group-hover:opacity-100 transition-opacity">01</span>
             <span className="font-serif text-base sm:text-lg text-white relative z-10 text-center drop-shadow-md">Properties<br/>Available</span>
