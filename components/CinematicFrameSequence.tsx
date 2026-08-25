@@ -273,7 +273,7 @@ export default function CinematicFrameSequence() {
   }, [syncDrawNearestLoaded]);
 
   return (
-    <section ref={sectionRef} className="relative w-full" style={{ height: "400vh" }}>
+    <section ref={sectionRef} className="relative w-full">
       <div
         className="sticky top-0 left-0 overflow-hidden bg-charcoal-900"
         style={{ width: "100vw", height: "100dvh" }}
@@ -292,6 +292,16 @@ export default function CinematicFrameSequence() {
         <div className="absolute inset-0 pointer-events-none z-10">
           <HtmlOverlay progress={progress} />
         </div>
+      </div>
+
+      {/* Invisible scroll snap points (4 blocks of 100dvh = 400dvh total scroll space)
+          These correspond exactly to the 4 wording scenes: 
+          Progress 0, 0.33, 0.66, 1.0 */}
+      <div className="relative w-full pointer-events-none" style={{ marginTop: "-100dvh" }}>
+        <div style={{ height: "100dvh", scrollSnapAlign: "start" }} />
+        <div style={{ height: "100dvh", scrollSnapAlign: "start" }} />
+        <div style={{ height: "100dvh", scrollSnapAlign: "start" }} />
+        <div style={{ height: "100dvh", scrollSnapAlign: "start" }} />
       </div>
     </section>
   );
