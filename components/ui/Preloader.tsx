@@ -115,7 +115,7 @@ export default function Preloader() {
   const tx = 0;                   // Perfectly aligned horizontally
   const ty = -10;                 // Perfectly aligned with the keyhole slot vertically
   
-  const ry = -90;                 // Key always points directly straight into the lock
+  const ry = 90;                  // Positive 90deg makes the tip point INTO the lock (negative Z)
   const rz = 0;                   // No tilt
   const rx = 90 * tE;             // Rolls 90deg inside the lock to unlock
   
