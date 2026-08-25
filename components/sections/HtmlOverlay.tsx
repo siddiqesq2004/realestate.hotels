@@ -1,25 +1,23 @@
 "use client";
 
 interface HtmlOverlayProps {
-  progress?: number;
+  activeScene?: number; // 0, 1, 2, 3
 }
 
-export default function HtmlOverlay({ progress = 0 }: HtmlOverlayProps) {
+export default function HtmlOverlay({ activeScene = 0 }: HtmlOverlayProps) {
   
-  const getSceneOpacity = (start: number, end: number) => {
-    // If progress is within the exact range, fully visible.
-    // Allow slight fade-in/out buffers automatically via CSS transitions if it falls out of range.
-    if (progress >= start && progress <= end) {
+  const getSceneOpacity = (sceneIndex: number) => {
+    if (activeScene === sceneIndex) {
       return "opacity-100 translate-y-0";
     }
-    return "opacity-0 translate-y-4";
+    return "opacity-0 translate-y-4 pointer-events-none";
   };
 
   return (
     <div className="w-full h-full flex flex-col justify-center items-center text-center p-8">
       
-      {/* Scene 1: The Arrival (0% - 18%) */}
-      <div className={`transition-all duration-700 ease-out absolute flex flex-col items-center ${getSceneOpacity(0.00, 0.18)}`}>
+      {/* Scene 1: The Arrival */}
+      <div className={`transition-all duration-700 ease-out absolute flex flex-col items-center ${getSceneOpacity(0)}`}>
         <p className="font-sans text-sm md:text-base text-white/70 uppercase tracking-[0.3em] mb-4 drop-shadow-lg">
           HOTEL REAL ESTATE REIMAGINED
         </p>
@@ -28,8 +26,8 @@ export default function HtmlOverlay({ progress = 0 }: HtmlOverlayProps) {
         </h1>
       </div>
 
-      {/* Scene 2: The Architecture Reveals Itself (22% - 48%) */}
-      <div className={`transition-all duration-700 ease-out absolute flex flex-col items-center ${getSceneOpacity(0.22, 0.48)}`}>
+      {/* Scene 2: The Architecture Reveals Itself */}
+      <div className={`transition-all duration-700 ease-out absolute flex flex-col items-center ${getSceneOpacity(1)}`}>
         <h2 className="font-serif text-3xl sm:text-4xl md:text-6xl text-white mb-6 drop-shadow-[0_4px_24px_rgba(0,0,0,0.9)] leading-tight tracking-wide">
           CRAFTED FOR<br />EXCEPTIONAL LIVING.
         </h2>
@@ -38,8 +36,8 @@ export default function HtmlOverlay({ progress = 0 }: HtmlOverlayProps) {
         </p>
       </div>
 
-      {/* Scene 3: The Destination Expands (52% - 78%) */}
-      <div className={`transition-all duration-700 ease-out absolute flex flex-col items-center ${getSceneOpacity(0.52, 0.78)}`}>
+      {/* Scene 3: The Destination Expands */}
+      <div className={`transition-all duration-700 ease-out absolute flex flex-col items-center ${getSceneOpacity(2)}`}>
         <h2 className="font-serif text-3xl sm:text-5xl md:text-7xl text-white drop-shadow-[0_4px_24px_rgba(0,0,0,0.9)] leading-tight tracking-wide mb-4">
           MORE THAN A STAY.
         </h2>
@@ -48,8 +46,8 @@ export default function HtmlOverlay({ progress = 0 }: HtmlOverlayProps) {
         </p>
       </div>
 
-      {/* Scene 4: The Grand Reveal (82% - 100%) */}
-      <div className={`transition-all duration-700 ease-out absolute flex flex-col items-center ${getSceneOpacity(0.82, 1.00)} ${progress >= 0.82 ? "pointer-events-auto" : ""}`}>
+      {/* Scene 4: The Grand Reveal */}
+      <div className={`transition-all duration-700 ease-out absolute flex flex-col items-center ${getSceneOpacity(3)} ${activeScene === 3 ? "pointer-events-auto" : ""}`}>
         <h2 className="font-serif text-4xl sm:text-6xl md:text-8xl text-white mb-6 drop-shadow-[0_4px_24px_rgba(0,0,0,0.9)] tracking-widest uppercase text-center leading-tight">
           AURA HOTEL<br className="md:hidden" /> RESIDENCES
         </h2>
