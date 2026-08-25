@@ -4,6 +4,8 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import gsap from "gsap";
 import HtmlOverlay from "./sections/HtmlOverlay";
 
+import { useUIStore } from "@/store/uiStore";
+
 const TOTAL_FRAMES = 209;
 const LAST_FRAME = TOTAL_FRAMES - 1;
 
@@ -185,6 +187,9 @@ export default function CinematicFrameSequence() {
     let isTransitioning = false;
     let touchStartY = 0;
 
+    // Reset store on mount just in case
+    useUIStore.getState().setNavHidden(false);
+
     const navigateToStep = (direction: 1 | -1) => {
       if (isTransitioning) return;
       
@@ -195,6 +200,9 @@ export default function CinematicFrameSequence() {
         
         // Update React state exactly ONCE per transition (prevents 60fps re-rendering jerkiness)
         setActiveScene(currentStepIndex);
+        
+        // Hide top nav if on the final scene
+        useUIStore.getState().setNavHidden(currentStepIndex === 3);
         
         // Use GSAP for buttery smooth, perfectly eased transition
         gsap.to(currentProgressRef.current, {

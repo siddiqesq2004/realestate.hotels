@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { Menu, X } from "lucide-react";
 import { motion } from "framer-motion";
+import { useUIStore } from "@/store/uiStore";
 
 // Subtle magnetic button wrapper
 const MagneticButton = ({ children, className, onClick }: { children: React.ReactNode, className?: string, onClick?: () => void }) => {
@@ -40,6 +41,7 @@ const MagneticButton = ({ children, className, onClick }: { children: React.Reac
 export default function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const isNavHidden = useUIStore((state) => state.isNavHidden);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -62,7 +64,8 @@ export default function Navigation() {
     <header
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-700 ease-in-out",
-        isScrolled
+        isNavHidden ? "-translate-y-full opacity-0 pointer-events-none" : "translate-y-0 opacity-100",
+        isScrolled && !isNavHidden
           ? "py-4 bg-charcoal-900/80 backdrop-blur-md border-b border-white/5"
           : "py-8 bg-transparent"
       )}
