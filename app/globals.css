@@ -28,7 +28,9 @@
 }
 
 html {
-  scroll-behavior: smooth;
+  /* scroll-behavior intentionally unset — custom rAF lerp handles smoothing;
+     CSS smooth-scroll fights the JS interpolation and causes jitter on mobile */
+  scroll-behavior: auto;
 }
 
 html, body {
