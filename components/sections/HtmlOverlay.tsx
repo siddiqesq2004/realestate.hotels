@@ -90,7 +90,7 @@ export default function HtmlOverlay({ activeScene = 0 }: HtmlOverlayProps) {
 
         </div>
 
-        <a href="/portfolio" className="inline-flex items-center gap-3 px-8 py-3 bg-[#b58d3c] hover:bg-[#cbad67] text-[#1c1c1c] uppercase tracking-[0.2em] text-xs sm:text-sm font-bold transition-all duration-300 shadow-[0_4px_20px_rgba(0,0,0,0.5)] hover:shadow-[0_0_30px_rgba(181,141,60,0.6)] rounded-full group">
+        <a href="/property" className="inline-flex items-center gap-3 px-8 py-3 bg-[#b58d3c] hover:bg-[#cbad67] text-[#1c1c1c] uppercase tracking-[0.2em] text-xs sm:text-sm font-bold transition-all duration-300 shadow-[0_4px_20px_rgba(0,0,0,0.5)] hover:shadow-[0_0_30px_rgba(181,141,60,0.6)] rounded-full group">
           <span>Explore Full Portfolio</span>
           <span className="text-lg leading-none transform group-hover:translate-x-1 transition-transform">&rarr;</span>
         </a>
