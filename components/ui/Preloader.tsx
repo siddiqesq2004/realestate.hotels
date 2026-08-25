@@ -4,12 +4,12 @@ import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 
 // Pseudo-3D Extruded Key Component
-const SolidKey3D = ({ layers = 20, progress = 0 }) => {
-  const colorFront = "#e5c07b"; // Bright gold for front face
-  const colorEdge = "#997a00";  // Darker bronze for the extruded depth
+const SolidKey3D = ({ layers = 24, progress = 0 }) => {
+  const colorFront = "#e5c07b"; 
+  const colorEdge = "#997a00";  
   
   return (
-    <div className="relative w-24 h-24 sm:w-32 sm:h-32" style={{ transformStyle: 'preserve-3d', transform: 'translateZ(10px)' }}>
+    <div className="relative w-24 h-24" style={{ transformStyle: 'preserve-3d', transform: `translateZ(${layers / 2}px)` }}>
       {Array.from({ length: layers }).map((_, i) => (
         <svg 
           key={i} 
@@ -29,6 +29,34 @@ const SolidKey3D = ({ layers = 20, progress = 0 }) => {
   );
 };
 
+// 3D Brass Lock Plate Component
+const LockPlate = ({ glowP }: { glowP: number }) => (
+  <svg viewBox="0 0 100 150" className="absolute w-24 h-36 drop-shadow-2xl" style={{ transform: 'translateZ(0px)' }}>
+    <defs>
+      <linearGradient id="brass" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stopColor="#f3d794" />
+        <stop offset="50%" stopColor="#b58d3c" />
+        <stop offset="100%" stopColor="#8c6b2a" />
+      </linearGradient>
+      <linearGradient id="brassGlow" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stopColor="#ffeba8" />
+        <stop offset="50%" stopColor="#e5c07b" />
+        <stop offset="100%" stopColor="#b58d3c" />
+      </linearGradient>
+      <filter id="insetShadow">
+        <feDropShadow dx="0" dy="2" stdDeviation="2" floodOpacity="0.5" />
+      </filter>
+    </defs>
+    <path 
+      fill={glowP > 0 ? "url(#brassGlow)" : "url(#brass)"}
+      filter="url(#insetShadow)" 
+      fillRule="evenodd" 
+      style={{ transition: 'fill 0.3s' }}
+      d="M50 0C77.6 0 100 22.4 100 50V100C100 127.6 77.6 150 50 150C22.4 150 0 127.6 0 100V50C0 22.4 22.4 0 50 0ZM50 40C43.37 40 38 45.37 38 52C38 56.88 40.92 61.08 45.1 63.02L42 90H58L54.9 63.02C59.08 61.08 62 56.88 62 52C62 45.37 56.63 40 50 40Z" 
+    />
+  </svg>
+);
+
 export default function Preloader() {
   const [progress, setProgress] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -37,7 +65,7 @@ export default function Preloader() {
   useEffect(() => {
     let startTime: number;
     let animationFrameId: number;
-    const duration = 2200; // 2.2 seconds for the full 3D cinematic unlock
+    const duration = 2400; // 2.4 seconds for the realistic cinematic unlock
 
     const animate = (time: number) => {
       if (!startTime) startTime = time;
@@ -49,7 +77,7 @@ export default function Preloader() {
       if (p < 100) {
         animationFrameId = requestAnimationFrame(animate);
       } else {
-        setTimeout(() => setIsLoaded(true), 400); // Hold the unlocked state briefly
+        setTimeout(() => setIsLoaded(true), 500); // Hold unlocked state briefly
       }
     };
 
@@ -67,13 +95,13 @@ export default function Preloader() {
   if (isUnmounted) return null;
 
   // 3D Animation Math derived from 0-100 progress
-  // Phase 1 (0-50%): Insert Key (Flies in from front)
-  // Phase 2 (50-85%): Turn Key (Rolls 90 degrees)
-  // Phase 3 (85-100%): Unlock Shockwave / Glow
+  // Phase 1 (0-50%): Insert Key (Flies in and aligns with keyhole)
+  // Phase 2 (50-80%): Turn Key (Rolls 90 degrees inside lock)
+  // Phase 3 (80-100%): Unlock Shockwave / Glow
 
   const insertP = Math.min(progress, 50) / 50;
-  const turnP = Math.max(0, Math.min(progress - 50, 35)) / 35;
-  const glowP = Math.max(0, progress - 85) / 15;
+  const turnP = Math.max(0, Math.min(progress - 50, 30)) / 30;
+  const glowP = Math.max(0, progress - 80) / 20;
 
   // Smooth easing functions
   const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
@@ -82,11 +110,14 @@ export default function Preloader() {
   const iE = easeOut(insertP);
   const tE = easeInOut(turnP);
 
-  // 3D Transform values for true 3D rotation
-  const tz = 300 * (1 - iE); // Starts 300px close to camera, pushes into 0
-  const ry = -10 - 65 * iE;  // Starts almost flat, turns -75deg into the lock
-  const rz = -45 * (1 - iE); // Starts tilted, straightens out
-  const rx = -90 * tE;       // Rolls -90deg on its own axis to sweep teeth up
+  // Key Transforms relative to the lock plate
+  const tz = 250 * (1 - iE);      // Starts 250px out, pushes in to 0
+  const tx = 150 * (1 - iE);      // Starts 150px right, aligns to 0
+  const ty = 40 * (1 - iE) - 10;  // Starts 40px down, aligns to keyhole center (-10px)
+  
+  const ry = -20 - 70 * iE;       // Starts slightly angled, turns to -90 (pointing straight into lock)
+  const rz = -45 * (1 - iE);      // Starts tilted, straightens to 0
+  const rx = 90 * tE;             // Rolls 90deg to unlock
   
   const keyOpacity = Math.min(insertP * 3, 1);
 
@@ -99,32 +130,47 @@ export default function Preloader() {
     >
       <div 
         className="flex flex-col items-center justify-center transform transition-transform duration-1000 w-full" 
-        style={{ transform: isLoaded ? 'scale(1.1)' : 'scale(1)' }}
+        style={{ transform: isLoaded ? 'scale(1.15)' : 'scale(1)' }}
       >
         
-        {/* 3D Scene Container */}
+        {/* 3D Scene Root */}
         <div 
-          className="relative mb-16 flex items-center justify-center w-full"
-          style={{ perspective: '1000px' }}
+          className="relative mb-20 flex items-center justify-center w-full"
+          style={{ perspective: '1200px' }}
         >
-          {/* Shockwave effect on unlock */}
+          {/* Entire Lock Scene tilted slightly so we can see the glorious 3D volume */}
           <div 
-            className="absolute w-24 h-24 rounded-full border-[2px] border-[#e5c07b]"
-            style={{
-              opacity: glowP > 0 ? 1 - glowP : 0,
-              transform: `scale(${0.5 + glowP * 3})`,
-            }}
-          />
-
-          {/* The 3D Key wrapper */}
-          <div
-            style={{
-              transform: `translateZ(${tz}px) rotateY(${ry}deg) rotateZ(${rz}deg) rotateX(${rx}deg)`,
-              opacity: keyOpacity,
-              transformStyle: "preserve-3d"
-            }}
+            style={{ transform: `rotateY(-25deg) rotateX(15deg) scale(${1 + glowP * 0.1})`, transformStyle: 'preserve-3d' }} 
+            className="relative flex items-center justify-center"
           >
-             <SolidKey3D layers={20} progress={glowP} />
+            {/* Shockwave effect on unlock */}
+            <div 
+              className="absolute w-32 h-48 rounded-[40px] border-[2px] border-[#e5c07b]"
+              style={{
+                opacity: glowP > 0 ? 1 - glowP : 0,
+                transform: `scale(${1 + glowP * 0.4}) translateZ(5px)`,
+              }}
+            />
+
+            {/* Lock Interior (Black void that hides the tip of the inserted key) */}
+            <div 
+              className="absolute w-20 h-32 bg-[#0a0a0a] rounded-[30px]" 
+              style={{ transform: 'translateZ(-2px)', boxShadow: 'inset 0 0 20px black' }} 
+            />
+
+            {/* Brass Lock Plate */}
+            <LockPlate glowP={glowP} />
+
+            {/* The 3D Key */}
+            <div
+              style={{
+                transform: `translateZ(${tz}px) translateX(${tx}px) translateY(${ty}px) rotateY(${ry}deg) rotateZ(${rz}deg) rotateX(${rx}deg)`,
+                opacity: keyOpacity,
+                transformStyle: "preserve-3d"
+              }}
+            >
+               <SolidKey3D layers={24} progress={glowP} />
+            </div>
           </div>
         </div>
 
