@@ -239,7 +239,7 @@ export default function PropertyPage() {
       </section>
 
       {/* Other Properties Section */}
-      <section className="py-32 px-6 md:px-12 max-w-7xl mx-auto border-t border-white/5">
+      <section id="portfolio" className="py-32 px-6 md:px-12 max-w-7xl mx-auto border-t border-white/5 scroll-mt-20">
         <FadeIn>
           <h2 className="text-4xl md:text-5xl font-serif text-ivory-100 text-center mb-16">
             Explore <span className="text-bronze-400 italic">Our Hotel Portfolio</span>
